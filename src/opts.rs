@@ -1,3 +1,4 @@
+use core::fmt;
 use std::str::FromStr;
 use clap::Parser;
 use std::path::Path;
@@ -20,7 +21,7 @@ pub struct CsvOpts {
     #[arg(short, long, value_parser = verify_input_file)]
     pub input: String,
 
-    #[arg(short, long, default_value = "output.json")]
+    #[arg(short, long)]
     pub output: Option<String>,
 
     #[arg(long, value_parser = parse_format, default_value = "json")]
@@ -37,21 +38,36 @@ pub struct CsvOpts {
 pub enum OutputFormat {
     Json,
     Yaml,
+    // Toml,
 }
 
 impl FromStr for OutputFormat {
     type Err = anyhow::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
+        match s.to_lowercase().as_str() {
             "json" => Ok(OutputFormat::Json),
             "yaml" => Ok(OutputFormat::Yaml),
+            // "toml" => Ok(OutputFormat::Toml),
             _ => Err(anyhow::anyhow!("Invalid output format: {}", s)),
         }
     }
 }
 
+impl From<OutputFormat> for &'static str {
+    fn from(format: OutputFormat) -> Self {
+        match format {
+            OutputFormat::Json => "json",
+            OutputFormat::Yaml => "yaml",
+        }
+    }
+}
 
+impl fmt::Display for OutputFormat {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", Into::<&str>::into(*self))
+    }
+}
 /// =================================================================
 ///  检验函数
 /// 
