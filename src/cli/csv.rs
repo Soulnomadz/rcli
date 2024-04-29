@@ -1,11 +1,11 @@
 use core::fmt;
 use std::str::FromStr;
 use clap::Parser;
-use std::path::Path;
+use crate::verify_file;
 
 #[derive(Debug, Parser)]
 pub struct CsvOpts {
-    #[arg(short, long, value_parser = verify_input_file)]
+    #[arg(short, long, value_parser = verify_file)]
     pub input: String,
 
     #[arg(short, long)]
@@ -55,20 +55,9 @@ impl fmt::Display for OutputFormat {
         write!(f, "{}", Into::<&str>::into(*self))
     }
 }
-/// =================================================================
-///  检验函数
-/// 
-fn verify_input_file(input_file: &str) -> Result<String, String> {
-    if Path::new(input_file).exists() {
-        Ok(input_file.into())
-    } else {
-        Err(format!("Input file not found: {}", input_file))
-    }
-}
 
 fn parse_format(format: &str) -> Result<OutputFormat, anyhow::Error> {
     format.parse()
 }
-
 
 

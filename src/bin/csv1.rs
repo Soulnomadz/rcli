@@ -1,4 +1,4 @@
-use std::{error::Error, io, process};
+use std::{error::Error, process};
 use csv;
 
 fn example() -> Result<(), Box<dyn Error>> {

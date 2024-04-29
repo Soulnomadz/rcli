@@ -2,6 +2,7 @@ use clap::Parser;
 use super::cli::{
     csv::CsvOpts,
     genpass::GenPassOpts,
+    base64::Base64SubCommand,
 };
 
 #[derive(Debug, Parser)]
@@ -17,6 +18,6 @@ pub enum SubCommand {
     Csv(CsvOpts),
     #[command(name = "genpass", about= "Generate a random password")]
     GenPass(GenPassOpts),
-    // #[command(name="base64", about= "Encode or decode base64")]
-    // Base64(Base64SubCommand),
+    #[command(subcommand)]
+    Base64(Base64SubCommand),
 }
