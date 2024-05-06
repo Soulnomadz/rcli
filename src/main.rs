@@ -1,6 +1,6 @@
 use clap::Parser;   // 提供Opts::parse()
 use rcli::{process_csv, process_genpass, process_decode, process_encode};
-use rcli::{Opts, SubCommand, Base64SubCommand};
+use rcli::{Opts, SubCommand, Base64SubCommand, TextSubCommand};
 
 fn main() -> anyhow::Result<()>{
     let opts = Opts::parse();
@@ -16,7 +16,7 @@ fn main() -> anyhow::Result<()>{
         SubCommand::GenPass(opt) => {
             process_genpass(opt.length, opt.uppercase, opt.lowercase, opt.numbers, opt.symbols)?;
         }
-        SubCommand::Base64(opt) => match opt {
+        SubCommand::Base64(subcmd) => match subcmd {
             Base64SubCommand::Encode(opt) => {
                 // println!("encode: {:?}", opt);
                 process_encode(&opt.input, opt.format)?
@@ -25,6 +25,15 @@ fn main() -> anyhow::Result<()>{
                 // println!("decode: {:?}", opt);
                 process_decode(&opt.input, opt.format)?
             }
+        }
+        SubCommand::Text(subcmd) => match subcmd {
+            TextSubCommand::Sign(opt) => {
+                println!("{:?}", opt);
+            }
+            TextSubCommand::Verify(opt) => {
+                println!("{:?}", opt);
+            }
+            // _ => println!("something is not supported"),
         }
     }
     Ok(())

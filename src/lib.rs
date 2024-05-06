@@ -7,9 +7,10 @@ pub use process::csv_convert::process_csv;
 pub use process::gen_pass::process_genpass;
 pub use process::b64::*;
 
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 pub use cli::base64::Base64SubCommand;
+pub use cli::text::TextSubCommand;
 
 /// =================================================================
 ///  检验函数
@@ -22,6 +23,16 @@ pub fn verify_file(input_file: &str) -> Result<String, String> {
     }
 }
 
+pub fn verify_path(path: &str) -> Result<PathBuf, &'static str> {
+    let p = Path::new(path);
+    if p.exists() && p.is_dir() {
+        Ok(path.into())
+    } else {
+        Err("Path not found")
+    }
+}
+
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -32,5 +43,11 @@ mod tests {
         assert_eq!(verify_file("*"), Err("Input file not found: *".into()));
         assert_eq!(verify_file("Cargo.toml"), Ok("Cargo.toml".into()));
         assert_eq!(verify_file("not-exist"), Err("Input file not found: not-exist".into()));
+    }
+
+    #[test]
+    fn test_vetify_path() {
+        assert_eq!(verify_path("src"), Ok(PathBuf::from("src")));
+        // assert_eq!(verify_path("-"), Ok(std::io::stdin() as AsRef<PathBuf>));
     }
 }

@@ -3,6 +3,7 @@ use super::cli::{
     csv::CsvOpts,
     genpass::GenPassOpts,
     base64::Base64SubCommand,
+    text::TextSubCommand
 };
 
 #[derive(Debug, Parser)]
@@ -20,4 +21,6 @@ pub enum SubCommand {
     GenPass(GenPassOpts),
     #[command(subcommand)]
     Base64(Base64SubCommand),
+    #[command(subcommand)]
+    Text(TextSubCommand),
 }
