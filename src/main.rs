@@ -1,6 +1,10 @@
 use clap::Parser;   // 提供Opts::parse()
-use rcli::{process_csv, process_genpass, process_decode, process_encode};
+// use rcli::{process_csv, process_genpass, process_decode, process_encode};
+use rcli::*;
 use rcli::{Opts, SubCommand, Base64SubCommand, TextSubCommand};
+use rcli::utils::*;
+use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine};
+use std::fs;
 
 fn main() -> anyhow::Result<()>{
     let opts = Opts::parse();
@@ -14,7 +18,8 @@ fn main() -> anyhow::Result<()>{
             process_csv(&opt.input, &output, opt.format)?; 
         },
         SubCommand::GenPass(opt) => {
-            process_genpass(opt.length, opt.uppercase, opt.lowercase, opt.numbers, opt.symbols)?;
+            let pass = process_genpass(opt.length, opt.uppercase, opt.lowercase, opt.numbers, opt.symbols)?;
+            println!("{}", pass);
         }
         SubCommand::Base64(subcmd) => match subcmd {
             Base64SubCommand::Encode(opt) => {
@@ -28,12 +33,32 @@ fn main() -> anyhow::Result<()>{
         }
         SubCommand::Text(subcmd) => match subcmd {
             TextSubCommand::Sign(opt) => {
-                println!("{:?}", opt);
+                // println!("{:?}", opt);
+                let mut reader = get_reader(&opt.input)?;
+                let key = get_content(&opt.key)?;
+                let sig = process_text_sign(&mut reader, &key, opt.format)?;
+
+                let encoded = URL_SAFE_NO_PAD.encode(sig);
+                println!("{:?}", encoded);
             }
             TextSubCommand::Verify(opt) => {
-                println!("{:?}", opt);
+                // println!("{:?}", opt);
+                let mut reader = get_reader(&opt.input)?;
+                let key = get_content(&opt.key)?;
+                let decoded = URL_SAFE_NO_PAD.decode(&opt.sig)?;
+                let verified = process_text_verify(&mut reader, &key, &decoded, opt.format)?;
+                if verified { 
+                    println!("✓ Signature verified");
+                } else {
+                    println!("⚠ Signature not verified");
+                }
             }
-            // _ => println!("something is not supported"),
+            TextSubCommand::Generate(opt) => {
+                let key = process_text_key_generate(opt.format)?;
+                for(k, v) in key {
+                    fs::write(opt.output_path.join(k), v)?;
+                }
+            }
         }
     }
     Ok(())

@@ -1,16 +1,18 @@
 mod opts;
 mod process;
 mod cli;
+pub mod utils;
 
 pub use opts::{Opts, SubCommand};
 pub use process::csv_convert::process_csv;
 pub use process::gen_pass::process_genpass;
 pub use process::b64::*;
+pub use process::text::*;
 
 use std::path::{Path, PathBuf};
 
 pub use cli::base64::Base64SubCommand;
-pub use cli::text::TextSubCommand;
+pub use cli::text::{TextSubCommand, TextSignFormat};
 
 /// =================================================================
 ///  检验函数

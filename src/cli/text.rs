@@ -13,8 +13,8 @@ pub enum TextSubCommand {
     Sign(TextSignOpts),
     #[command(about = "Verify a signature with a public/session key")]
     Verify(TextVerifyOpts),
-    // #[command(about = "Generaate a random blake3 key or ed25519 key pair")]
-    // Generate(KeyGenerateOpts),
+    #[command(about = "Generaate a random blake3 key or ed25519 key pair")]
+    Generate(KeyGenerateOpts),
 }
 
 #[derive(Debug, Parser)]
@@ -23,7 +23,7 @@ pub struct TextSignOpts {
     pub input: String,
     #[arg(short, long, value_parser = verify_file)]
     pub key: String,
-    #[arg(long, value_parser = verify_file, default_value = "blake3")]
+    #[arg(long, value_parser = parse_text_sign_format, default_value = "blake3")]
     pub format: TextSignFormat,
 }
 
@@ -62,9 +62,9 @@ impl FromStr for TextSignFormat {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "blake3" => Ok(TextSignFormat::Blake3),
+            "blake3"  => Ok(TextSignFormat::Blake3),
             "ed25519" => Ok(TextSignFormat::Ed25519),
-            _ => Err(anyhow::anyhow!("Invalid sign format: {}", s)),
+            _         => Err(anyhow::anyhow!("Invalid sign format")),
         }
     }
 }
@@ -72,14 +72,14 @@ impl FromStr for TextSignFormat {
 impl From<TextSignFormat> for &'static str {
     fn from(format: TextSignFormat) -> Self {
         match format {
-            TextSignFormat::Blake3 => "blake3",
+            TextSignFormat::Blake3  => "blake3",
             TextSignFormat::Ed25519 => "ed25519",
         }
     }
 }
 
 impl fmt::Display for TextSignFormat {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", Into::<&str>::into(*self))
     }
 }

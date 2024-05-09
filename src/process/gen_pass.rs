@@ -12,7 +12,7 @@ pub fn process_genpass(
     lower: bool,
     number: bool,
     symbol: bool,
-) -> anyhow::Result<()> {
+) -> anyhow::Result<String> {
     let mut rng  = rand::thread_rng();
     let mut password = Vec::new();
     let mut chars = Vec::new();
@@ -39,7 +39,7 @@ pub fn process_genpass(
         password.push(*c);
     }
     password.shuffle(&mut rng);
-    print!("{}", String::from_utf8(password)?);
+    // print!("{}", String::from_utf8(password)?);
 
-    Ok(())
+    Ok(String::from_utf8(password)?)
 }
