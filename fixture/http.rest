@@ -1,8 +1,16 @@
+### http test with tower-http
+
+GET http://localhost:8080/tower/Cargo.toml
+# Range: bytes=0-100
+# Accept-Encoding: gzip
+
+
 ### http test
+GET http://localhost:8080/src/lib.rs
 
-GET http://localhost:8080/sss.png1
 
-
+### http test for default index.html
+GET http://localhost:8080/tower/src/
 
 ### http test
 curl --location 'https://dmp.etonedu.cn/dmp-dssp-datasvc-ms/dssp/api/datasvc/common-query/prj-dmp-dssp-mgmt-ms/qc_ads_s_stat_dmp_ads_rpt_running_daily_user_run_result?schoolId=112632&intStartDate=20240101&intEndDate=20240510&groupType=5&rowCount=10000&offset=0' \
