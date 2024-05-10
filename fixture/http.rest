@@ -1,0 +1,9 @@
+### http test
+
+GET http://localhost:8080/sss.png1
+
+
+
+### http test
+curl --location 'https://dmp.etonedu.cn/dmp-dssp-datasvc-ms/dssp/api/datasvc/common-query/prj-dmp-dssp-mgmt-ms/qc_ads_s_stat_dmp_ads_rpt_running_daily_user_run_result?schoolId=112632&intStartDate=20240101&intEndDate=20240510&groupType=5&rowCount=10000&offset=0' \
+--header 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3MTU0OTQ1MzYsInVzZXJuYW1lIjoiZG1wX2RldiJ9.fbeiMNChINNFVM5qfclUav8ggHEDLvctrgM8-uvVzeU'

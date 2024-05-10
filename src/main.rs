@@ -6,7 +6,8 @@ use rcli::utils::*;
 use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine};
 use std::fs;
 
-fn main() -> anyhow::Result<()>{
+#[tokio::main]
+async fn main() -> anyhow::Result<()>{
     tracing_subscriber::fmt::init();
 
     let opts = Opts::parse();
@@ -66,7 +67,7 @@ fn main() -> anyhow::Result<()>{
             HttpSubCommand::Serve(opt) => {
                 println!("{:?}", opt);
                 // println!("Serving at http://0.0.0.0:{}", opt.port);
-                process_http_serve(&opt.dir, opt.port)
+                process_http_serve(opt.dir, opt.port).await?;
             }
         }
     }
