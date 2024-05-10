@@ -7,6 +7,8 @@ use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine};
 use std::fs;
 
 fn main() -> anyhow::Result<()>{
+    tracing_subscriber::fmt::init();
+
     let opts = Opts::parse();
     match opts.cmd {
         SubCommand::Csv(opt) => { 
@@ -58,6 +60,13 @@ fn main() -> anyhow::Result<()>{
                 for(k, v) in key {
                     fs::write(opt.output_path.join(k), v)?;
                 }
+            }
+        }
+        SubCommand::Http(subcmd) => match subcmd {
+            HttpSubCommand::Serve(opt) => {
+                println!("{:?}", opt);
+                // println!("Serving at http://0.0.0.0:{}", opt.port);
+                process_http_serve(&opt.dir, opt.port)
             }
         }
     }

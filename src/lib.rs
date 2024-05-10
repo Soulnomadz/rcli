@@ -8,11 +8,13 @@ pub use process::csv_convert::process_csv;
 pub use process::gen_pass::process_genpass;
 pub use process::b64::*;
 pub use process::text::*;
+pub use process::http_serve::process_http_serve;
 
 use std::path::{Path, PathBuf};
 
 pub use cli::base64::Base64SubCommand;
 pub use cli::text::{TextSubCommand, TextSignFormat};
+pub use cli::http::HttpSubCommand;
 
 /// =================================================================
 ///  检验函数
