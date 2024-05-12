@@ -1,4 +1,6 @@
 use clap::Parser;
+use crate::CmdExector;
+use enum_dispatch::enum_dispatch;
 
 #[derive(Debug, Parser)]
 pub struct GenPassOpts {
@@ -16,4 +18,19 @@ pub struct GenPassOpts {
 
     #[arg(long, default_value_t = true)]
     pub symbols: bool,
+}
+
+impl CmdExector for GenPassOpts {
+    async fn execute(self) -> anyhow::Result<()> {
+        let ret = crate::process_genpass(
+            self.length,
+            self.uppercase,
+            self.lowercase,
+            self.numbers,
+            self.symbols,
+        )?;
+        println!("{}", ret);
+
+        Ok(())
+    }
 }

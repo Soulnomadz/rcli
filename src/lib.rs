@@ -3,7 +3,7 @@ mod process;
 mod cli;
 pub mod utils;
 
-pub use opts::{Opts, SubCommand};
+pub use opts::*;
 pub use process::csv_convert::process_csv;
 pub use process::gen_pass::process_genpass;
 pub use process::b64::*;
@@ -15,6 +15,9 @@ use std::path::{Path, PathBuf};
 pub use cli::base64::Base64SubCommand;
 pub use cli::text::{TextSubCommand, TextSignFormat};
 pub use cli::http::HttpSubCommand;
+pub use utils::*;
+
+use enum_dispatch::enum_dispatch;
 
 /// =================================================================
 ///  检验函数
@@ -36,6 +39,11 @@ pub fn verify_path(path: &str) -> Result<PathBuf, &'static str> {
     }
 }
 
+#[allow(async_fn_in_trait)]
+#[enum_dispatch]
+pub trait CmdExector {
+    async fn execute(self) -> anyhow::Result<()>;
+}
 
 #[cfg(test)]
 mod tests {

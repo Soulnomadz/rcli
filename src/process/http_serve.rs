@@ -6,10 +6,13 @@ use axum::{
     http::StatusCode,
 };
 use tower_http::services::ServeDir;
+use enum_dispatch::enum_dispatch;
 // use tracing_subscriber::fmt::time::ChronoLocal;
 
+use crate::{cli::http::HttpServeOpts, CmdExector};
 
 use std::path::PathBuf;
+// use std::path::Path as stdPath;
 use std::net::SocketAddr;
 use std::sync::Arc;
 
@@ -61,6 +64,21 @@ async fn file_handler(
             StatusCode::NOT_FOUND,
             format!("File not found: {}", p.display())
         )
+    } else if p.is_dir() {
+        match get_filelist(p.clone()).await {
+            Ok(list) => (
+                StatusCode::OK,
+                format!("{}", list)
+            ),
+            Err(e) => {
+                warn!("Error reading directory: {:?}", e);
+                (StatusCode::INTERNAL_SERVER_ERROR, e.to_string())
+            }
+        }
+        // (
+        //     StatusCode::OK,
+        //     format!("Directory: {}", list?.display())
+        // )
     } else {
         match tokio::fs::read_to_string(p).await {
             Ok(content) => {
@@ -74,6 +92,38 @@ async fn file_handler(
         }
     }
 }
+
+async fn get_filelist(dir: impl AsRef<std::path::Path>) -> Result<String> {
+    let mut html = String::new();
+    html.push_str("<html><body><ul>");
+
+    // let mut entries = std::fs::read_dir(dir)?;
+    // while let Ok(entry) = entries.next().await? {
+    //     let entry = entry.path().file_name()?.to_str()?;
+    // }
+    
+    for entry in std::fs::read_dir(dir)? {
+        if let Ok(entry) = entry {
+            let path = entry.path();
+            let name = path.file_name().unwrap().to_string_lossy();
+            html.push_str(&format!(
+                "<li><a href=\"{}\">{}</a></li>", 
+                name, name));
+        }
+    }
+
+    html.push_str("</ul></body></html>");
+
+    Ok(html)
+}
+
+impl CmdExector for HttpServeOpts {
+    async fn execute(self) -> Result<()> {
+        process_http_serve(self.dir, self.port).await?;
+        Ok(())
+    }
+}
+
 
 #[cfg(test)]
 mod tests {
@@ -90,3 +140,4 @@ mod tests {
         assert!(content.trim().starts_with("[package]"));
     }
 }
+

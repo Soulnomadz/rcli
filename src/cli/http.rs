@@ -1,5 +1,6 @@
 use clap::Parser;
 use std::path::PathBuf;
+use enum_dispatch::enum_dispatch;
 
 use crate::*;
 
