@@ -1,6 +1,5 @@
 use clap::Parser;
 use crate::CmdExector;
-use enum_dispatch::enum_dispatch;
 
 #[derive(Debug, Parser)]
 pub struct GenPassOpts {

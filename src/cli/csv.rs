@@ -2,7 +2,6 @@ use core::fmt;
 use std::str::FromStr;
 use clap::Parser;
 use crate::{verify_file, CmdExector};
-use enum_dispatch::enum_dispatch;
 
 #[derive(Debug, Parser)]
 pub struct CsvOpts {

@@ -16,6 +16,11 @@ pub use cli::base64::Base64SubCommand;
 pub use cli::text::{TextSubCommand, TextSignFormat};
 pub use cli::http::HttpSubCommand;
 pub use utils::*;
+pub use cli::csv::*;
+pub use cli::base64::*;
+pub use cli::genpass::*;
+pub use cli::http::*;
+pub use cli::text::*;
 
 use enum_dispatch::enum_dispatch;
 

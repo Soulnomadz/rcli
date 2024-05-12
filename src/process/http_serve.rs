@@ -6,7 +6,6 @@ use axum::{
     http::StatusCode,
 };
 use tower_http::services::ServeDir;
-use enum_dispatch::enum_dispatch;
 // use tracing_subscriber::fmt::time::ChronoLocal;
 
 use crate::{cli::http::HttpServeOpts, CmdExector};

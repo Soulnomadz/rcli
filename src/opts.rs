@@ -6,6 +6,7 @@ use super::cli::{
     text::TextSubCommand,
     http::HttpSubCommand,
 };
+use enum_dispatch::enum_dispatch;
 
 #[derive(Debug, Parser)]
 #[command(name = "rcli", version, author, about, long_about = None)]
@@ -15,6 +16,7 @@ pub struct Opts {
 }
 
 #[derive(Debug, Parser)]
+#[enum_dispatch(CmdExector)]
 pub enum SubCommand {
     #[command(name = "csv", about= "Show CSV, or convert CSV to other formats")]
     Csv(CsvOpts),

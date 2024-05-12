@@ -4,6 +4,7 @@ use crate::{verify_file, CmdExector};
 use enum_dispatch::enum_dispatch;
 
 #[derive(Debug, Parser)]
+#[enum_dispatch(CmdExector)] 
 pub enum Base64SubCommand {
     #[command(name = "encode", about = "encode a string to base64")]
     Encode(Base64EncodeOpts),

@@ -12,6 +12,7 @@ use enum_dispatch::enum_dispatch;
 use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine};
 
 #[derive(Debug, Parser)]
+#[enum_dispatch(CmdExector)]
 pub enum TextSubCommand {
     #[command(about = "Sign a text with a private/session key and return a signature")]
     Sign(TextSignOpts),

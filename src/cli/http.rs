@@ -5,6 +5,7 @@ use enum_dispatch::enum_dispatch;
 use crate::*;
 
 #[derive(Debug, Parser)]
+#[enum_dispatch(CmdExector)]
 pub enum HttpSubCommand {
     #[command(about = "Serve a directory over HTTP")]
     Serve(HttpServeOpts),
