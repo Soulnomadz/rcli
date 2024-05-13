@@ -4,6 +4,7 @@ use axum::{
     Router, routing,
     extract::{State, Path},
     http::StatusCode,
+    response::{Html, IntoResponse},
 };
 use tower_http::services::ServeDir;
 // use tracing_subscriber::fmt::time::ChronoLocal;
@@ -55,38 +56,35 @@ pub async fn process_http_serve(path: PathBuf, port: u16) -> Result<()> {
 async fn file_handler(
     State(state): State<Arc<HttpServeState>>,
     Path(path): Path<String>,
-) -> (StatusCode, String) {
+) -> impl IntoResponse {
     let p = std::path::Path::new(&state.path).join(path);
     info!("Reading file {:?}", p);
     if !p.exists() {
         (
             StatusCode::NOT_FOUND,
-            format!("File not found: {}", p.display())
+            Html("File not found: {}".into())
         )
     } else if p.is_dir() {
         match get_filelist(p.clone()).await {
             Ok(list) => (
                 StatusCode::OK,
-                format!("{}", list)
+                Html(list)
             ),
             Err(e) => {
                 warn!("Error reading directory: {:?}", e);
-                (StatusCode::INTERNAL_SERVER_ERROR, e.to_string())
+                (StatusCode::INTERNAL_SERVER_ERROR, Html(e.to_string()))
             }
         }
-        // (
-        //     StatusCode::OK,
-        //     format!("Directory: {}", list?.display())
-        // )
+
     } else {
         match tokio::fs::read_to_string(p).await {
             Ok(content) => {
                 info!("Read {} bytes", content.len());
-                (StatusCode::OK, content)
+                (StatusCode::OK, Html(content))
             }
             Err(e) => {
                 warn!("Error reading file: {:?}", e);
-                (StatusCode::INTERNAL_SERVER_ERROR, e.to_string())
+                (StatusCode::INTERNAL_SERVER_ERROR, Html(e.to_string()))
             }
         }
     }
@@ -96,11 +94,6 @@ async fn get_filelist(dir: impl AsRef<std::path::Path>) -> Result<String> {
     let mut html = String::new();
     html.push_str("<html><body><ul>");
 
-    // let mut entries = std::fs::read_dir(dir)?;
-    // while let Ok(entry) = entries.next().await? {
-    //     let entry = entry.path().file_name()?.to_str()?;
-    // }
-    
     for entry in std::fs::read_dir(dir)? {
         if let Ok(entry) = entry {
             let path = entry.path();
