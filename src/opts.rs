@@ -5,6 +5,7 @@ use super::cli::{
     base64::Base64SubCommand,
     text::TextSubCommand,
     http::HttpSubCommand,
+    jwt::JwtSubCommand,
 };
 use enum_dispatch::enum_dispatch;
 
@@ -28,4 +29,6 @@ pub enum SubCommand {
     Text(TextSubCommand),
     #[command(subcommand)]
     Http(HttpSubCommand),
+    #[command(subcommand)]
+    Jwt(JwtSubCommand),
 }

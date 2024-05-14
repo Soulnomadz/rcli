@@ -9,6 +9,7 @@ pub use process::gen_pass::process_genpass;
 pub use process::b64::*;
 pub use process::text::*;
 pub use process::http_serve::process_http_serve;
+pub use process::jwt::*;
 
 use std::path::{Path, PathBuf};
 
@@ -21,6 +22,7 @@ pub use cli::base64::*;
 pub use cli::genpass::*;
 pub use cli::http::*;
 pub use cli::text::*;
+pub use cli::jwt::*;
 
 use enum_dispatch::enum_dispatch;
 
