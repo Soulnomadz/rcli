@@ -24,6 +24,8 @@ pub use cli::http::*;
 pub use cli::text::*;
 pub use cli::jwt::*;
 
+pub use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine};
+
 use enum_dispatch::enum_dispatch;
 
 /// =================================================================

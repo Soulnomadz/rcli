@@ -4,6 +4,12 @@ use std::collections::HashMap;
 use ed25519_dalek::{SigningKey, VerifyingKey, Signature, Signer, Verifier};
 use crate::{process_genpass, TextSignFormat};
 use rand::rngs::OsRng;
+use chacha20poly1305::{
+    aead::{Aead, AeadCore, KeyInit},
+    ChaCha20Poly1305, Key, Nonce,
+};
+
+// use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine};
 
 pub trait TextSigner {
     fn sign(&self, reader: &mut dyn Read) -> Result<Vec<u8>>;
@@ -148,6 +154,38 @@ pub fn process_text_key_generate(format: TextSignFormat) -> Result<HashMap<&'sta
         TextSignFormat::Blake3 => Blake3::generate(),
         TextSignFormat::Ed25519 => Ed25519Signer::generate(),
     }
+}
+
+pub fn process_text_encrypt(reader: &mut dyn Read, key: &[u8]) -> Result<Vec<u8>> {
+    let mut buf = Vec::new();
+    reader.read_to_end(&mut buf)?;
+
+    let key = Key::from_slice(&key);
+    let cipher = ChaCha20Poly1305::new(key);
+    let nonce = ChaCha20Poly1305::generate_nonce(&mut OsRng);
+
+    let ciphertext = cipher.encrypt(&nonce, &*buf)
+        .map_err(|e| anyhow::anyhow!("Encrypt error: {}", e))?;
+    
+    Ok(ciphertext)
+}
+
+pub fn process_text_decrypt(reader: &mut dyn Read, key: &[u8]) -> Result<Vec<u8>> {
+    let key = Key::from_slice(&key);
+    let cipher = ChaCha20Poly1305::new(key);
+    
+    let mut buf = Vec::new();
+    reader.read_to_end(&mut buf)?;
+    // let buf = crate::URL_SAFE_NO_PAD.decode(buf)?;
+
+    let nonce = &buf[..12];
+    let nonce = Nonce::from_slice(nonce);
+    let ciphertext = &buf[12..];
+
+    let plaintext = cipher.decrypt(nonce, ciphertext)
+        .map_err(|e| anyhow::anyhow!("Decryption error: {:?}", e))?;
+
+    Ok(plaintext)
 }
 
 #[cfg(test)]

@@ -9,7 +9,7 @@ use axum::{
 use tower_http::services::ServeDir;
 // use tracing_subscriber::fmt::time::ChronoLocal;
 
-use crate::{cli::http::HttpServeOpts, CmdExector};
+// use crate::{cli::http::HttpServeOpts, CmdExector};
 
 use std::path::PathBuf;
 // use std::path::Path as stdPath;
@@ -109,12 +109,6 @@ async fn get_filelist(dir: impl AsRef<std::path::Path>) -> Result<String> {
     Ok(html)
 }
 
-impl CmdExector for HttpServeOpts {
-    async fn execute(self) -> Result<()> {
-        process_http_serve(self.dir, self.port).await?;
-        Ok(())
-    }
-}
 
 
 #[cfg(test)]

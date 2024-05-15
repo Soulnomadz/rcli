@@ -9,7 +9,8 @@ use crate::verify_path;
 use crate::CmdExector;
 use enum_dispatch::enum_dispatch;
 
-use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine};
+// use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine};
+use crate::*;
 
 #[derive(Debug, Parser)]
 #[enum_dispatch(CmdExector)]
@@ -20,6 +21,10 @@ pub enum TextSubCommand {
     Verify(TextVerifyOpts),
     #[command(about = "Generaate a random blake3 key or ed25519 key pair")]
     Generate(KeyGenerateOpts),
+    #[command(about = "Encrypt a message with chacha20poly1305")]
+    Encrypt(TextEncryptOpts),
+    #[command(about = "Decrypt a message with chacha20poly1305")]
+    Decrypt(TextDecryptOpts),
 }
 
 #[derive(Debug, Parser)]
@@ -89,6 +94,26 @@ impl fmt::Display for TextSignFormat {
     }
 }
 
+#[derive(Debug, Parser)]
+pub struct TextEncryptOpts {
+    // 待加密内容，通过控制台直接输入或从文件读取
+    #[arg(short, long, value_parser = verify_file, default_value = "-")]
+    pub input: String,
+    // 加密密钥，通过控制台直接输入或从文件读取
+    #[arg(short, long, value_parser = verify_file)]
+    pub key: String,
+}
+
+#[derive(Debug, Parser)]
+pub struct TextDecryptOpts {
+    // 待解密内容，通过控制台直接输入或从文件读取
+    #[arg(short, long, value_parser = verify_file, default_value = "-")]
+    pub input: String,
+    // 解密密钥，通过控制台直接输入或从文件读取
+    #[arg(short, long, value_parser = verify_file)]
+    pub key: String,
+}
+
 impl CmdExector for TextSignOpts {
     async fn execute(self) -> anyhow::Result<()> {
         let mut reader = crate::get_reader(&self.input)?;
@@ -125,6 +150,32 @@ impl CmdExector for KeyGenerateOpts {
         for(k, v) in key {
             std::fs::write(self.output_path.join(k), v)?;
         }
+
+        Ok(())
+    }
+}
+
+impl CmdExector for TextEncryptOpts {
+    async fn execute(self) -> anyhow::Result<()> {
+        let mut reader = crate::get_reader(&self.input)?;
+        let key = crate::get_content(&self.key)?;
+
+        let encrypted = crate::process_text_encrypt(&mut reader, &key)?;
+        let output = URL_SAFE_NO_PAD.encode(encrypted);
+        println!("加密文本: {}", output);
+
+        Ok(()) 
+    }
+}
+
+impl CmdExector for TextDecryptOpts {
+    async fn execute(self) -> anyhow::Result<()> {
+        // 获取base64解码后的加密文本
+        let encrypted = URL_SAFE_NO_PAD.decode(crate::get_content(&self.input)?)?;
+        let key = crate::get_content(&self.key)?;
+
+        let decrypted = crate::process_text_decrypt(&mut encrypted.as_slice(), &key)?;
+        println!("解密文本: {}", String::from_utf8_lossy(&decrypted));
 
         Ok(())
     }
